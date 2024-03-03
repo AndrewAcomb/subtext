@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
             io.emit('receiveMessage', { text: message, user: userName, emoji: emoji });
         } catch (error) {
             console.error('Error getting emoji:', error);
-            io.emit('receiveMessage', { text: message, user: userName, emoji: '😊' });
+            io.emit('receiveMessage', { text: message, user: userName, emoji: '' });
         }
     });
 
