@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', async (message) => {
         try {
             const vibeData = await getVibe(message);
-            const jsonMatch = vibeData.match(/\{.*\}/);
+            const jsonMatch = vibeData.match(/\{[\s\S]*?\}/);
             if (jsonMatch) {
                 const jsonStr = jsonMatch[0];
 

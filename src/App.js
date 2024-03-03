@@ -2,24 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { MessageBox, Input, Button } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css';
-
-const MessageWithDetails = ({ msg, currentUser }) => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}>
-      <MessageBox
-        position={msg.user === currentUser ? 'right' : 'left'}
-        type="text"
-        text={msg.text}
-      />
-      <div style={{ display: 'flex', justifyContent: msg.user === currentUser ? 'flex-end' : 'flex-start' }}>
-        {msg.vibe ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Vibe: ${msg.vibe}`}</span> : undefined}
-        {msg.emotion ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Emotion: ${msg.emotion}`}</span> : undefined}
-        {msg.tone ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Tone: ${msg.tone}`}</span> : undefined}
-
-      </div>
-    </div>
-  );
-};
+import './App.css';
 
 const socket = io.connect('http://localhost:3001');
 
@@ -27,23 +10,28 @@ function App() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState('');
+  const [lastOtherVibe, setLastOtherVibe] = useState({ vibe: '', emotion: '', tone: '' });
+  const [lastUserVibe, setLastUserVibe] = useState({ vibe: '', emotion: '', tone: '' });
 
   useEffect(() => {
     socket.on('yourUserName', (name) => {
-      if (!username) setUsername(name);
+      setUsername(name);
     });
 
     socket.on('receiveMessage', (messageObj) => {
       setMessages((prevMessages) => [...prevMessages, messageObj]);
+      if (messageObj.user !== username) {
+        setLastOtherVibe({ vibe: messageObj.vibe, emotion: messageObj.emotion, tone: messageObj.tone });
+      } else {
+        setLastUserVibe({ vibe: messageObj.vibe, emotion: messageObj.emotion, tone: messageObj.tone });
+      }
     });
 
-    // Cleanup subscription on unmount
     return () => {
       socket.off('receiveMessage');
       socket.off('yourUserName');
-    }
-  }, []);
-
+    };
+  }, [username]);
 
   const sendMessage = () => {
     if (message.trim()) {
@@ -62,9 +50,12 @@ function App() {
     <div>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
         {messages.map((msg, index) => (
-          <MessageWithDetails
-            msg={msg}
-            currentUser={username}
+          <MessageBox
+            key={index}
+            position={msg.user === username ? 'right' : 'left'}
+            style={{ background: msg.user === username ? 'blue' : 'gray' }}
+            type="text"
+            text={msg.text}
           />
         ))}
       </div>
@@ -82,6 +73,18 @@ function App() {
           />
         }
       />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+        <div style={{ flex: 1, textAlign: 'left' }}>
+          <div>Vibe: {lastOtherVibe.vibe}</div>
+          <div>Emotion: {lastOtherVibe.emotion}</div>
+          <div>Tone: {lastOtherVibe.tone}</div>
+        </div>
+        <div style={{ flex: 1, textAlign: 'right' }}>
+          <div>Vibe: {lastUserVibe.vibe}</div>
+          <div>Emotion: {lastUserVibe.emotion}</div>
+          <div>Tone: {lastUserVibe.tone}</div>
+        </div>
+      </div>
     </div>
   );
 }
