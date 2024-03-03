@@ -59,6 +59,19 @@ function App() {
           />
         ))}
       </div>
+      {messages.length ? (<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+        <div style={{ textAlign: 'left' }}>
+          <div>Vibe: {lastOtherVibe.vibe}</div>
+          <div>Emotion: {lastOtherVibe.emotion}</div>
+          <div>Tone: {lastOtherVibe.tone}</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div>Vibe: {lastUserVibe.vibe}</div>
+          <div>Emotion: {lastUserVibe.emotion}</div>
+          <div>Tone: {lastUserVibe.tone}</div>
+        </div>
+      </div>) : undefined}
+
       <Input
         placeholder="Type here..."
         value={message}
@@ -73,18 +86,6 @@ function App() {
           />
         }
       />
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-        <div style={{ flex: 1, textAlign: 'left' }}>
-          <div>Vibe: {lastOtherVibe.vibe}</div>
-          <div>Emotion: {lastOtherVibe.emotion}</div>
-          <div>Tone: {lastOtherVibe.tone}</div>
-        </div>
-        <div style={{ flex: 1, textAlign: 'right' }}>
-          <div>Vibe: {lastUserVibe.vibe}</div>
-          <div>Emotion: {lastUserVibe.emotion}</div>
-          <div>Tone: {lastUserVibe.tone}</div>
-        </div>
-      </div>
     </div>
   );
 }
