@@ -51,9 +51,8 @@ function App() {
             key={index}
             title={msg.user}
             position={msg.user === username ? 'right' : 'left'}
-
             type="text"
-            text={msg.text}
+            text={`${msg.text} ${msg.emoji}`}
           />
         ))}
       </div>
