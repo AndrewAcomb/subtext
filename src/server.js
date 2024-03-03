@@ -39,8 +39,16 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', async (message) => {
         try {
             const vibeData = await getVibe(message);
-            const { vibe, emotion, tone } = JSON.parse(vibeData);
-            io.emit('receiveMessage', { text: message, user: userName, vibe: vibe, emotion: emotion, tone: tone });
+            const jsonMatch = vibeData.match(/\{.*\}/);
+            if (jsonMatch) {
+                const jsonStr = jsonMatch[0];
+
+                const { vibe, emotion, tone } = JSON.parse(jsonStr);
+                io.emit('receiveMessage', { text: message, user: userName, vibe: vibe, emotion: emotion, tone: tone });
+            } else {
+                console.error('Error parsing vibe data:', vibeData);
+                io.emit('receiveMessage', { text: message, user: userName, vibe: '', emotion: '', tone: '' });
+            }
         } catch (error) {
             console.error('Error getting vibe data:', error);
             io.emit('receiveMessage', { text: message, user: userName });
