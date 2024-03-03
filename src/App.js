@@ -3,6 +3,24 @@ import io from 'socket.io-client';
 import { MessageBox, Input, Button } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css';
 
+const MessageWithDetails = ({ msg, currentUser }) => {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}>
+      <MessageBox
+        position={msg.user === currentUser ? 'right' : 'left'}
+        type="text"
+        text={msg.text}
+      />
+      <div style={{ display: 'flex', justifyContent: msg.user === currentUser ? 'flex-end' : 'flex-start' }}>
+        {msg.vibe ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Vibe: ${msg.vibe}`}</span> : undefined}
+        {msg.emotion ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Emotion: ${msg.emotion}`}</span> : undefined}
+        {msg.tone ? <span style={{ margin: '0 8px', fontSize: 'smaller' }}>{`Tone: ${msg.tone}`}</span> : undefined}
+
+      </div>
+    </div>
+  );
+};
+
 const socket = io.connect('http://localhost:3001');
 
 function App() {
@@ -42,17 +60,11 @@ function App() {
 
   return (
     <div>
-      <div style={{ padding: '10px', background: '#ddd' }}>
-        <strong>{username}</strong>
-      </div>
       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
         {messages.map((msg, index) => (
-          <MessageBox
-            key={index}
-            title={msg.user}
-            position={msg.user === username ? 'right' : 'left'}
-            type="text"
-            text={`${msg.text} ${msg.emoji}`}
+          <MessageWithDetails
+            msg={msg}
+            currentUser={username}
           />
         ))}
       </div>

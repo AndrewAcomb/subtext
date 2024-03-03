@@ -7,9 +7,10 @@ require('dotenv').config();
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-async function getEmoji(message) {
+async function getVibe(message) {
     const gemini = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
-    const prompt = `Please respond only with a single emoji that best represents the tone and/or content of the following message: "${message}"`;
+    const prompt = `How would you represent the vibe, tone and emotion of the following message: "${message}"?
+    Please respond with ONLY a valid JSON string with the following fields: {vibe: messageVibe, emotion: emotionDescription, tone: toneDescription} where messageVibe is a single emoji representing the vibe of the message, emotionDescription is one of the following words ["Joy","Sadness","Anger","Fear","Surprise","Disgust","Love","Hate","Excitement","Contentment","Guilt","Shame","Pride","Jealousy","Envy","Compassion","Empathy","Sympathy","Anxiety","Relief"], and toneDescription is one of the following words  ["Formal","Informal","Humorous","Serious","Sarcastic","Playful","Authoritative","Persuasive","Sympathetic","Objective","Subjective","Optimistic","Pessimistic","Confident","Doubtful","Encouraging","Discouraging","Neutral","Casual","Intense"]`;
     const result = await gemini.generateContent(prompt);
     const response = await result.response;
     return response.text();
@@ -20,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:3000", // Replace with the domain of your frontend app
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"],
         allowedHeaders: ["my-custom-header"],
         credentials: true
@@ -37,11 +38,12 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', async (message) => {
         try {
-            const emoji = await getEmoji(message);
-            io.emit('receiveMessage', { text: message, user: userName, emoji: emoji });
+            const vibeData = await getVibe(message);
+            const { vibe, emotion, tone } = JSON.parse(vibeData);
+            io.emit('receiveMessage', { text: message, user: userName, vibe: vibe, emotion: emotion, tone: tone });
         } catch (error) {
-            console.error('Error getting emoji:', error);
-            io.emit('receiveMessage', { text: message, user: userName, emoji: '' });
+            console.error('Error getting vibe data:', error);
+            io.emit('receiveMessage', { text: message, user: userName });
         }
     });
 
