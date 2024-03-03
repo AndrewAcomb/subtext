@@ -30,6 +30,7 @@ The styling of the text is critical and should implicitly convey the emotion/ton
 DO NOT add any unneccesary css and html.
 Be creative. The html will be run in a text messaging interface that supports html and css. 
 Add animations using css and simple javascript wherever applicable. 
+Add emojis wherever applicable.
 DO NOT change the text. only add styling. Keep the output within a div container with class message.
 Do not assume that a css exists. Add any css that is required for the styling. Add all css within the div.
 Any css should only affect the content within div and should not affect any other html.
